@@ -1,45 +1,47 @@
-## Plugin Setup
-1. Find an appropriate [plugin-slug](https://wordpress.org/plugins/) according to the solution of the plugin.
-2. Write the min 4-5 character prefix, plugin name, short description(up to 150 chars), long description (min 3-4 para), keywords(min 4), block name, and block description in a temporary notebook.
-2. If your block is not part of `b-blocks`, then the text domain should be your `plugin-slug`.
-4. Apply 1st and 2nd list data to this template with case sensitivity: uppercase for uppercase, lowercase for lowercase, title case for title case, and camel case for camel case. (for the block name try different way to search (blockname, blockName, BlockName, Block Name, block name))
-5. Complete the `readme.txt` file.
-6. The main element is `.wp-block-b-blocks-{blockname}`, and its immediate child is `.bBlocksBlockName`. Do not apply width or columns for the main element.
-7. Write appropriate class and ID names for the elements.
-8. Add the initial roadmap for the plugin in the `todo.txt`.
-9. If you skip one of these, we will not provide any support for the project.
-10. Enjoy CODING!
 
-The folder structure that `plugin-zip` accepts is:
+// ABS PATH
+if ( !defined( 'ABSPATH' ) ) { exit; }
 
-```
-/plugin-name
-	plugin-name.php
-	uninstall.php
-	/languages
-	/includes
-	/admin
-		/js
-		/css
-		/images
-	/public
-		/js
-		/css
-		/images
-```
+// Constant
+define( 'PREFIX_VERSION', isset( $_SERVER['HTTP_HOST'] ) && 'localhost' === $_SERVER['HTTP_HOST'] ? time() : '1.0.0' );
+define( 'PREFIX_DIR_URL', plugin_dir_url( __FILE__ ) );
+define( 'PREFIX_DIR_PATH', plugin_dir_path( __FILE__ ) );
 
-**If you want to add custom folders, you have to add those folder names to the {files} array in the `package.json` file.**
+if( !class_exists( 'PREFIXPlugin' ) ){
+	class PREFIXPlugin{
+		function __construct(){
+			add_action( 'init', [ $this, 'onInit' ] );
+			// add_action('wp_enqueue_scripts', [$this, 'mytheme_enqueue_assets']);
+			add_action('enqueue_block_assets', [$this, 'mytheme_enqueue_assets']);
+		}
 
-### Required packages for this project
-```json
-"dependencies": {
-	"immer": "latest"
-},
-"devDependencies": {
-	"@wordpress/scripts": "latest",
-	"eslint-webpack-plugin": "latest"
+		function onInit(){
+			register_block_type( __DIR__ . '/build' );
+		}
+
+
+		function mytheme_enqueue_assets() {
+			wp_enqueue_style(
+                'swiper-css',
+                'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css'
+            );
+            // Swiper JS
+            wp_enqueue_script(
+                'swiper-js',
+                'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js',
+                [],
+                null,
+                true
+            );
+		}
+		
+
+	}
+	new PREFIXPlugin();
 }
-```
 
-## Editor Setup
-#### For this project use this setup in your IDE Editor. Preferred `Cursor`. If you want to set another setup for your personal/portfolio/example/tutorial project, use another IDE Editor. Setup the `Cursor` IDE using the provided `*.code-profile`
+// wp_enqueue_scripts == (frontend)
+// admin_enqueue_scripts == (backend)
+// enqueue_block_assets == (backend and frontend)
+//enqueue_block_editor_assets == (gutenberg editor)
+
